@@ -1,44 +1,45 @@
-function Convert(){
-  var nodeList;
-  var currentType = 't';
-  this.convertToWithCache = function(type){
-    if (!nodeList){
-      nodeList = [];
-      nodeList = getNodeListByRecursive("undefined", nodeList);
+function Converter(){
+  this.nodeList = [];
+  this.type = 't';
+  this.convert = function(type){
+    if (this.nodeList.length === 0){
+      this._setNodeList();
     }
-    if(type === "s" && currentType ==='t'){
-      for ( var i = 0; i < nodeList.length; i++ ){	
-        nodeList[i].s2t = nodeList[i].data;
-        nodeList[i].data = t2s(nodeList[i].data); 
+    if(type === "s" && this.type ==='t'){
+      for ( var i = 0; i < this.nodeList.length; i++ ){	
+        this.nodeList[i].s2t = this.nodeList[i].data;
+        this.nodeList[i].data = t2s(this.nodeList[i].data); 
       };
-      currentType = 's';
-    }else if(type === "t" && currentType ==='s'){
-      for ( var i = 0; i < nodeList.length; i++ ){	
-        if(!!nodeList[i].s2t){
-          nodeList[i].data = nodeList[i].s2t;
+      this.type = 's';
+    }else if(type === "t" && this.type ==='s'){
+      for ( var i = 0; i < this.nodeList.length; i++ ){	
+        if(!!this.nodeList[i].s2t){
+          this.nodeList[i].data = this.nodeList[i].s2t;
         }
       }
-      currentType = 't';
+      this.type = 't';
     }
-  }
-}
-function getNodeListByRecursive(targetObj, nodeList){
-  var allObjs;
-  var currentObj;
-  if( typeof( targetObj ) == "object" ){
-    allObjs = targetObj.childNodes;
-  }
-  else{ 
-    allObjs = document.body.childNodes;
-  }
+  };
 
-  for ( var i = 0; i < allObjs.length; i++ ){	
-    currentObj = allObjs.item(i);
-    if( currentObj.nodeType == 3 ){
-      nodeList.push(currentObj);
-    }else{
-      getNodeListByRecursive(currentObj, nodeList);
+  this._setNodeList = function(targetObj){
+    var currentObj;
+    targetObj = targetObj || document.body;
+    var allObjs = targetObj.childNodes;
+
+    for ( var i = 0; i < allObjs.length; i++ ){	
+      currentObj = allObjs.item(i);
+      if( currentObj.nodeType === 3 ){
+        this.nodeList.push(currentObj);
+      }else{
+        this._setNodeList(currentObj);
+      }
     }
-  }
-  return nodeList;
+  }; 
+
+
 }
+
+// module.exports = {
+//   convertTo: convertTo
+//   , getNodeListByRecursive: getNodeListByRecursive
+// };
