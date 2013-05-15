@@ -1,22 +1,34 @@
 function Converter(){
-  this.nodeList = [];
+  this.textNodeList = [];
+  this.inputNodeList = [];
   this.type = 't';
   this.convert = function(type){
-    if (this.nodeList.length === 0){
+    if (this.textNodeList.length === 0 && this.inputNodeList.length === 0){
       this._setNodeList();
     }
     if(type === "s" && this.type ==='t'){
-      for ( var i = 0; i < this.nodeList.length; i++ ){	
-        this.nodeList[i].s2t = this.nodeList[i].data;
-        this.nodeList[i].data = t2s(this.nodeList[i].data); 
+      for(var i = 0; i < this.textNodeList.length; i++){	
+        this.textNodeList[i].s2t = this.textNodeList[i].data;
+        this.textNodeList[i].data = t2s(this.textNodeList[i].data); 
+      };
+      for(var i = 0; i < this.inputNodeList.length; i++){	
+        this.inputNodeList[i].s2t = this.inputNodeList[i].value;
+        this.inputNodeList[i].value = t2s(this.inputNodeList[i].value); 
+        $(this.inputNodeList[i]).attr('value', this.inputNodeList[i].value);
       };
       this.type = 's';
     }else if(type === "t" && this.type ==='s'){
-      for ( var i = 0; i < this.nodeList.length; i++ ){	
-        if(!!this.nodeList[i].s2t){
-          this.nodeList[i].data = this.nodeList[i].s2t;
+      for(var i = 0; i < this.textNodeList.length; i++){	
+        if(!!this.textNodeList[i].s2t){
+          this.textNodeList[i].data = this.textNodeList[i].s2t;
         }
       }
+      for(var i = 0; i < this.inputNodeList.length; i++){	
+        if(!!this.inputNodeList[i].s2t){
+          this.inputNodeList[i].value = this.inputNodeList[i].s2t;
+          $(this.inputNodeList[i]).attr('value', this.inputNodeList[i].value);
+        }
+      };
       this.type = 't';
     }
   };
@@ -26,10 +38,12 @@ function Converter(){
     targetObj = targetObj || document.body;
     var allObjs = targetObj.childNodes;
 
-    for ( var i = 0; i < allObjs.length; i++ ){	
+    for(var i = 0; i < allObjs.length; i++){	
       currentObj = allObjs.item(i);
-      if( currentObj.nodeType === 3 ){
-        this.nodeList.push(currentObj);
+      if("|INPUT|input|".indexOf("|" + currentObj.tagName + "|") > -1){
+        this.inputNodeList.push(currentObj);
+      }else if(currentObj.nodeType === 3){
+        this.textNodeList.push(currentObj);
       }else{
         this._setNodeList(currentObj);
       }
@@ -39,7 +53,3 @@ function Converter(){
 
 }
 
-// module.exports = {
-//   convertTo: convertTo
-//   , getNodeListByRecursive: getNodeListByRecursive
-// };
