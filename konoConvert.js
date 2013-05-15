@@ -1,44 +1,45 @@
-function convertToSimplifiedChinese(targetObj){
-  var allObjs;
-  var currentObj;
-  if( typeof( targetObj ) == "object" ){
-    allObjs = targetObj.childNodes;
-  }
-  else{ 
-    allObjs = document.body.childNodes;
-  }
-  for ( var i = 0; i < allObjs.length; i++ ){	
-    currentObj = allObjs.item(i);
-    //TODO input tag
-    // if( "INPUT|input".indexOf(currentObj.tagName) > -1  
-    //   &&  currentObj.value != '' ){
-    //   currentObj.s2t = currentObj.value;
-    //   currentObj.value = t2s(currentObj.value);
-    if( currentObj.nodeType == 3 ){
-      currentObj.s2t = currentObj.data;
-      currentObj.data = t2s(currentObj.data); 
-    }else{
-      convertToSimplifiedChinese(currentObj);
+function Converter(){
+  this.nodeList = [];
+  this.type = 't';
+  this.convert = function(type){
+    if (this.nodeList.length === 0){
+      this._setNodeList();
     }
-  }
-}
-function convertToTraditionalChinese(targetObj){	
-  var allObjs;
-  var currentObj;
-  if( typeof( targetObj ) == "object" ){
-    allObjs = targetObj.childNodes;
-  }
-  else{ 
-    allObjs = document.body.childNodes;
-  }
-  for ( var i = 0; i < allObjs.length; i++ ){	
-    currentObj = allObjs.item(i);
-    if( currentObj.nodeType == 3 ){
-      if(!!currentObj.s2t){
-        currentObj.data = currentObj.s2t;
+    if(type === "s" && this.type ==='t'){
+      for ( var i = 0; i < this.nodeList.length; i++ ){	
+        this.nodeList[i].s2t = this.nodeList[i].data;
+        this.nodeList[i].data = t2s(this.nodeList[i].data); 
+      };
+      this.type = 's';
+    }else if(type === "t" && this.type ==='s'){
+      for ( var i = 0; i < this.nodeList.length; i++ ){	
+        if(!!this.nodeList[i].s2t){
+          this.nodeList[i].data = this.nodeList[i].s2t;
+        }
       }
-    }else{
-      convertToTraditionalChinese(currentObj);
+      this.type = 't';
     }
-  }
+  };
+
+  this._setNodeList = function(targetObj){
+    var currentObj;
+    targetObj = targetObj || document.body;
+    var allObjs = targetObj.childNodes;
+
+    for ( var i = 0; i < allObjs.length; i++ ){	
+      currentObj = allObjs.item(i);
+      if( currentObj.nodeType === 3 ){
+        this.nodeList.push(currentObj);
+      }else{
+        this._setNodeList(currentObj);
+      }
+    }
+  }; 
+
+
 }
+
+// module.exports = {
+//   convertTo: convertTo
+//   , getNodeListByRecursive: getNodeListByRecursive
+// };
