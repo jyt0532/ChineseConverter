@@ -1,0 +1,7 @@
+{
+  "name": "konoConvert",
+  "version": "0.0.0",
+  "dependencies": {
+    "jasmine-jquery": "jasmine-jquery"
+  }
+}
